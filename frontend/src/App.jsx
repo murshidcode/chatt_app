@@ -1,21 +1,52 @@
-export default function App() {
-  return (
-    <div className="p-8">
-      {/* Tailwind Test */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-blue-600">Tailwind Test</h1>
-        <p className="mt-2 text-gray-700">
-          This text uses Tailwind's text-gray-700
-        </p>
-      </div>
+import Navbar from "./components/Navbar";
+import SignUpPage from "./pages/SignUpPage";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import SettingsPage from "./pages/SettingsPage";
+import ProfilePage from "./pages/ProfilePage";
 
-      {/* DaisyUI Test */}
-      <div className="space-y-4">
-        <button className="btn btn-primary">Primary Button</button>
-        <button className="btn btn-secondary">Secondary Button</button>
-        <div className="alert alert-success">Success Alert</div>
-        <div className="alert alert-error">Error Alert</div>
+
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuthStore } from "./store/useAuthStore";
+import { useEffect } from "react";
+
+
+import {Loader} from "lucide-react";
+import {Toaster} from "react-hot-toast"
+
+const App = () => {
+  const { authUser,checkAuth,isCheckingAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  console.log({ authUser });
+
+  if (isCheckingAuth && !authUser)
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader className="size-10 animate-spin" />
       </div>
+    );
+
+  return (
+    <div>
+
+      
+        <Navbar/>
+
+       <Routes>
+        <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
+        <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/" />} />
+        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
+      </Routes>
+
+      <Toaster/>
+
     </div>
   )
 }
+export default App;
